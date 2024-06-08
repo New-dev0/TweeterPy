@@ -47,6 +47,8 @@ class Path:
     TWITTER_CDN = "https://abs.twimg.com/responsive-web/client-web"
     HOME_TIMELINE_GUEST_URL = "https://x.com/i/api/2/guide.json"
     X_MIGRATE_URL = "https://x.com/x/migrate"
+    UPLOAD_URL = f"https://upload.x.com/i/media/upload.json"
+
     # ENDPOINTS
     HOME_TIMELINE_ENDPOINT = "ggIgQGz-fN1Z9YBhAoTCVA/HomeTimeline"
     HOME_LATEST_TIMELINE_ENDPOINT = "Js4oMnCV2D4gpEocblJ6Tg/HomeLatestTimeline"
@@ -71,6 +73,12 @@ class Path:
     TWEET_LIKES_ENDPOINT = "mpMee2WCjo7Nm4gRRHHnvA/Favoriters"
     RETWEETED_BY_ENDPOINT = "7Fwe5A6kE05QIybims116A/Retweeters"
     USER_HIGHLIGHTS_ENDPOINT = "w9-i9VNm_92GYFaiyGT1NA/UserHighlightsTweets"
+    CREATE_TWEET_ENDPOINT = "oB-5XsHNAbjvARJEc8CZFw/CreateTweet"
+    FAVORITE_TWEET_ENDPOINT = "lI07N6Otwv1PhnEgXILM7A/FavoriteTweet"
+    UNFAVORITE_TWEET_ENDPOINT = "ZYKSe-w7KEslx3JhSIk5LA/UnfavoriteTweet"
+    RETWEET_ENDPOINT = "ojPdsZsimiJrUGLR1sjUtA/CreateRetweet"
+    DELETE_RETWEET_ENDPOINT = "iQtK4dl5hBmXewYZuEOKVw/DeleteRetweet"
+    DELETE_TWEET_ENDPOINT = "VaenaVgh5q5ih7kvyVjgtg/DeleteTweet"
 
 
 class FeatureSwitch:
