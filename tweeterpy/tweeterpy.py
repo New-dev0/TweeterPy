@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 class TweeterPy:
 
     def __init__(self):
+        self.__confirm_code_func = None
+
         if config.DISABLE_LOGS or config.DISABLE_EXTERNAL_LOGS:
             logger.debug("Disabling logs...")
             config.LOG_LEVEL = "ERROR" if config.DISABLE_LOGS else config.LOG_LEVEL
@@ -303,7 +305,9 @@ class TweeterPy:
             username = str(input("Enter Your Username or Email : ")).strip()
         if password is None:
             password = getpass.getpass()
-        TaskHandler(session=self.__session).login(username, password)
+        TaskHandler(session=self.__session,
+                    func=self.__confirm_code_func
+                    ).login(username, password)
         util.generate_headers(session=self.__session)
         try:
             user = self.me

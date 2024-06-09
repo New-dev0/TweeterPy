@@ -5,8 +5,9 @@ from .logging_util import disable_logger
 
 
 class TaskHandler:
-    def __init__(self, session=None):
+    def __init__(self, session=None, func=None):
         self.__session = session
+        self._func = func
 
     def _create_task_mapper(self, username, password, verification_input_data):
         # fmt: off  - Turns off formatting for this block of code. Just for the readability purpose.
@@ -225,9 +226,13 @@ class TaskHandler:
                 error_message = "\n".join(
                     [error["message"] for error in response["errors"]]
                 )
-                payload["subtask_inputs"][0]["enter_text"]["text"] = str(
-                    input(f"{error_message} - Type again ==> ")
-                )
+
+                if self._func:
+                    v_data = self._func(error_message)
+                else:
+                    v_data = input(f"{error_message} - Type again ==> ")
+
+                payload["subtask_inputs"][0]["enter_text"]["text"] = str(v_data)
             else:
                 handle_incorrect_input = False
         return response
@@ -283,7 +288,10 @@ class TaskHandler:
                         )
                         if error_message and input_type:
                             print(f"\n{error_message}\n")
-                            verification_input_data = str(input(input_message))
+                            if self._func:
+                                verification_input_data = self._func(input_message)
+                            else:
+                                verification_input_data = str(input(input_message))
                             task_flow_mapper[task_id].update(
                                 {"task_parameter": verification_input_data}
                             )
