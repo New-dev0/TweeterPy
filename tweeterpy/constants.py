@@ -47,7 +47,9 @@ class Path:
     TWITTER_CDN = "https://abs.twimg.com/responsive-web/client-web"
     HOME_TIMELINE_GUEST_URL = "https://x.com/i/api/2/guide.json"
     X_MIGRATE_URL = "https://x.com/x/migrate"
-    UPLOAD_URL = f"https://upload.x.com/i/media/upload.json"
+    UPLOAD_URL = "https://upload.x.com/i/media/upload.json"
+    FOLLOW_URL = "https://x.com/i/api/1.1/friendships/create.json"
+    UNFOLLOW_URL = "https://x.com/i/api/1.1/friendships/destroy.json"
 
     # ENDPOINTS
     HOME_TIMELINE_ENDPOINT = "ggIgQGz-fN1Z9YBhAoTCVA/HomeTimeline"

@@ -120,6 +120,7 @@ def handle_x_migration(session):
         return home_page
 
 def check_for_errors(response):
+    print(response)
     if isinstance(response, dict) and "errors" in response.keys():
         if not response.get("data"):
             error_message = "\n".join([error['message']

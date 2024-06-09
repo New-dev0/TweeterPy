@@ -1,6 +1,6 @@
 import requests
 import json
-import random
+import random, time
 import getpass, mimetypes, os, hashlib
 import logging.config
 from functools import reduce
@@ -338,6 +338,16 @@ class TweeterPy:
         return response["data"]["user_result_by_screen_name"]["result"]["rest_id"]
 
     @login_decorator
+    def follow(self, user_id):
+        return make_request(Path.FOLLOW_URL, session=self.__session, data={"user_id": user_id},
+                            method="POST")
+
+    @login_decorator
+    def unfollow(self, user_id):
+        return make_request(Path.UNFOLLOW_URL, session=self.__session, data={"user_id": user_id},
+                            method="POST")
+
+    @login_decorator
     def get_user_info(self, user_id):
         """Extracts user details like username, userid, bio, website, follower/following count etc.
 
@@ -491,26 +501,44 @@ class TweeterPy:
         url = f"{Path.UPLOAD_URL}?{urlencode(params)}"
         data = self.__session.post(url)
         mresponse = data.json()
+        s_index = 0
+        with open(media_path, "rb") as file:
+            while chunk:= file.read(1 * 1024 * 1024):
+                params = {
+                    "command": "APPEND",
+                    "media_id": mresponse["media_id"],
+                    "segment_index": s_index,
+                }
 
-        params = {
-            "command": "APPEND",
-            "media_id": mresponse["media_id"],
-            "segment_index": 0,
-        }
+                url = f"{Path.UPLOAD_URL}?{urlencode(params)}"
+                data = self.__session.post(url, files={"media": chunk})
+                s_index += 1
 
-        url = f"{Path.UPLOAD_URL}?{urlencode(params)}"
-        data = self.__session.post(url, files={"media": open(media_path, "rb")})
         if data.status_code != 204:
             raise Exception("Media Upload Failed")
 
         with open(media_path, "rb") as file:
             md5 = hashlib.md5(file.read()).hexdigest()
 
-        params = {"command": "FINALIZE", "media_id": mresponse["media_id"], "md5": md5}
+        params = {"command": "FINALIZE", "media_id": mresponse["media_id"], "md5": md5,
+                  "allow_async": True}
+
         url = f"{Path.UPLOAD_URL}?{urlencode(params)}"
 
-        data = self.__session.post(url)
-        return data.json()
+        data = self.__session.post(url).json()
+
+        if data.get("processing_info"):
+            check_after_secs = data["processing_info"]["check_after_secs"]
+            media_id = data["media_id"]
+            while data['processing_info'].get('state') == "pending" and check_after_secs:
+                print(f"Checking after {check_after_secs} seconds.")
+                time.sleep(check_after_secs)
+                params = {"command": "STATUS", "media_id": media_id}
+                url = f"{Path.UPLOAD_URL}?{urlencode(params)}"
+                data = self.__session.get(url).json()
+                check_after_secs = data.get("processing_info", {}).get("check_after_secs")
+
+        return data
 
     def favorite(self, tweet_id: str):
         """Favorite a tweet.
@@ -623,7 +651,8 @@ class TweeterPy:
             "media": {"media_entities": [], "possibly_sensitive": False},
             "semantic_annotation_ids": [],
         }
-        variables["media"]["media_entities"] = [
+        if media_ids:
+            variables["media"]["media_entities"] = [
             {"media_id": media_id, "tagged_users": []} for media_id in media_ids
         ]
 

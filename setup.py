@@ -5,6 +5,7 @@ SHORT_DESCRIPTION = "TweeterPy is a python library to extract data from Twitter.
 
 with open("requirements.txt") as file:
     dependencies = file.read().splitlines()
+
 with open("README.md", "r") as file:
     DESCRIPTION = file.read()
 
