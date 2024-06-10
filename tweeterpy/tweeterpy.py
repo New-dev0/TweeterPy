@@ -20,8 +20,10 @@ logger = logging.getLogger(__name__)
 
 class TweeterPy:
 
-    def __init__(self):
-        self.__confirm_code_func = None
+    def __init__(self, callback=None, proxy=None, verify=False):
+        self.confirm_code_func = callback
+        self.proxy = proxy
+        self._verify = verify
 
         if config.DISABLE_LOGS or config.DISABLE_EXTERNAL_LOGS:
             logger.debug("Disabling logs...")
@@ -218,9 +220,12 @@ class TweeterPy:
         try:
             logger.debug("Trying to generate a new session.")
             session = requests.Session()
-            if config.PROXY is not None:
-                session.proxies = config.PROXY
-                session.verify = False
+            proxy = self.proxy or config.PROXY
+
+            if proxy is not None:
+                session.proxies = proxy
+                session.verify = self._verify or False
+
             session.headers.update(util.generate_headers())
             # home_page = make_request(Path.BASE_URL, session=session)
             home_page = util.handle_x_migration(session=session)
@@ -306,7 +311,7 @@ class TweeterPy:
         if password is None:
             password = getpass.getpass()
         TaskHandler(session=self.__session,
-                    func=self.__confirm_code_func
+                    func=self.confirm_code_func
                     ).login(username, password)
         util.generate_headers(session=self.__session)
         try:
