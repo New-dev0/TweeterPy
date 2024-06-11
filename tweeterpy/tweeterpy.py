@@ -539,7 +539,7 @@ class TweeterPy:
         if data.get("processing_info"):
             check_after_secs = data["processing_info"]["check_after_secs"]
             media_id = data["media_id"]
-            while data['processing_info'].get('state') == "pending" and check_after_secs:
+            while data['processing_info'].get('state') in ["pending", "in_progress"] and check_after_secs:
                 print(f"Checking after {check_after_secs} seconds.")
                 time.sleep(check_after_secs)
                 params = {"command": "STATUS", "media_id": media_id}
